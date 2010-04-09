@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
@@ -52,18 +53,29 @@ namespace FixMixedTabs
             bool startsWithSpaces = false;
             bool startsWithTabs = false;
 
+            int lineNumber = 1;
             foreach (var line in snapshot.Lines)
             {
                 if (line.Length > 0)
                 {
                     char firstChar = line.Start.GetChar();
                     if (firstChar == '\t')
+                    {
                         startsWithTabs = true;
+                    }
                     else if (firstChar == ' ')
-                        startsWithSpaces = true;
+                    {
+                        // TODO: don't use '4', instead get the configured tab size.
+                        if (line.GetText().TakeWhile(c => c == ' ').Count() >= 4)
+                        {
+                            startsWithSpaces = true;
+                        }
+                    }
 
                     if (startsWithSpaces && startsWithTabs)
                         break;
+
+                    lineNumber += 1;
                 }
             }
 
